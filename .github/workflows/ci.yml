@@ -1,24 +1,19 @@
-name: Tests
+name: ci
 
 on:
   push:
-    branches: [main, addtests]
+    branches:
+      - main
+      - addtests
   pull_request:
-    branches: [main]
 
 jobs:
-  test:
-    name: Go Tests
+  Tests:
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v3
 
-      - name: Set up Go
-        uses: actions/setup-go@v4
-        with:
-          go-version: '1.22'  # <- This must be 1.22
-
-      - name: Run Tests
+      - name: Run tests
         run: go test ./...
 
