@@ -18,7 +18,7 @@ func TestGetAPIKey(t *testing.T) {
 
 	// Case 2: Malformed Authorization header
 	headers2 := http.Header{}
-	headers2.Set("Authorization", "Bearer") // missing actual key
+	headers2.Set("Authorization", "Bearer") // no token
 	key, err = GetAPIKey(headers2)
 	if err == nil {
 		t.Errorf("expected error when Authorization header is malformed")
@@ -29,13 +29,13 @@ func TestGetAPIKey(t *testing.T) {
 
 	// Case 3: Valid Authorization header
 	headers3 := http.Header{}
-	headers3.Set("Authorization", "Bearer AIzaSyA-X4VUXIF7MMpfgsPKShpsOWWvbeQ6pwQ") // Replace if needed
+	headers3.Set("Authorization", "Bearer my-secret-key-123")
 	key, err = GetAPIKey(headers3)
 	if err != nil {
 		t.Errorf("did not expect error, got: %v", err)
 	}
-	if key != "AIzaSyA-X4VUXIF7MMpfgsPKShpsOWWvbeQ6pwQ" {
-		t.Errorf("expected 'AIzaSyA-X4VUXIF7MMpfgsPKShpsOWWvbeQ6pwQ', got %q", key)
+	if key != "my-secret-key-123" {
+		t.Errorf("expected 'my-secret-key-123', got %q", key)
 	}
 }
 
