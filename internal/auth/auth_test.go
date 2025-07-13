@@ -1,27 +1,41 @@
 package auth
 
 import (
-    "os"
-    "testing"
+	"net/http"
+	"testing"
 )
 
 func TestGetAPIKey(t *testing.T) {
-    // Backup existing env variable if any
-    original := os.Getenv("API_KEY")
-    defer os.Setenv("API_KEY", original) // Restore after test
+	// Case 1: Missing Authorization header
+	headers1 := http.Header{}
+	key, err := GetAPIKey(headers1)
+	if err == nil {
+		t.Errorf("expected error when Authorization header is missing")
+	}
+	if key != "" {
+		t.Errorf("expected empty key when header is missing, got %q", key)
+	}
 
-    // Test case: environment variable not set
-    os.Unsetenv("API_KEY")
-    key := GetAPIKey()
-    if key != "" {
-        t.Errorf("expected empty string when API_KEY not set, got %q", key)
-    }
+	// Case 2: Malformed Authorization header
+	headers2 := http.Header{}
+	headers2.Set("Authorization", "Bearer") // missing actual key
+	key, err = GetAPIKey(headers2)
+	if err == nil {
+		t.Errorf("expected error when Authorization header is malformed")
+	}
+	if key != "" {
+		t.Errorf("expected empty key for malformed header, got %q", key)
+	}
 
-    // Test case: environment variable set
-    expected := "secret123"
-    os.Setenv("API_KEY", expected)
-    key = GetAPIKey()
-    if key != expected {
-        t.Errorf("expected %q, got %q", expected, key)
-    }
+	// Case 3: Valid Authorization header
+	headers3 := http.Header{}
+	headers3.Set("Authorization", "Bearer AIzaSyA-X4VUXIF7MMpfgsPKShpsOWWvbeQ6pwQ") // Replace if needed
+	key, err = GetAPIKey(headers3)
+	if err != nil {
+		t.Errorf("did not expect error, got: %v", err)
+	}
+	if key != "AIzaSyA-X4VUXIF7MMpfgsPKShpsOWWvbeQ6pwQ" {
+		t.Errorf("expected 'AIzaSyA-X4VUXIF7MMpfgsPKShpsOWWvbeQ6pwQ', got %q", key)
+	}
 }
+
