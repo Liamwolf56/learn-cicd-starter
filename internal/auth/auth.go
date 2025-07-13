@@ -28,6 +28,6 @@ func GetAPIKey(headers http.Header) (string, error) {
         return "", errors.New("authorization header missing API key")
     }
 
-    return key, nil
+    return "", nil
 }
 
