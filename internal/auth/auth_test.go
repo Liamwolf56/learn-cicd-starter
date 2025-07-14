@@ -38,4 +38,3 @@ func TestGetAPIKey(t *testing.T) {
 		t.Errorf("expected 'my-secret-key-123', got %q", key)
 	}
 }
-
