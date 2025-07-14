@@ -1,18 +1,19 @@
 name: ci
 
 on:
+  push:
+    branches:
+      - main
+      - addtests
   pull_request:
-    branches: [main]
 
 jobs:
-  tests:
-    name: Tests
+  Tests:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Check out code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v3
 
-      - name: Run tests
-        run: go test ./...
+      - name: Run tests with code coverage
+        run: go test -cover ./...
 
