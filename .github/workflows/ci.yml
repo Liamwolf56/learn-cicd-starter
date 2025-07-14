@@ -20,17 +20,8 @@ jobs:
         with:
           go-version: 1.22
 
-      - name: Add Go bin to PATH
-        run: echo "${HOME}/go/bin" >> $GITHUB_PATH
-
       - name: Run go test
         run: go test -cover ./...
-
-      - name: Install gosec
-        run: go install github.com/securego/gosec/v2/cmd/gosec@latest
-
-      - name: Run gosec
-        run: gosec ./...
 
   Style:
     name: Style
@@ -55,4 +46,25 @@ jobs:
 
       - name: Run staticcheck
         run: staticcheck ./...
+
+  Gosec:
+    name: Gosec
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: 1.22
+
+      - name: Add Go bin to PATH
+        run: echo "${HOME}/go/bin" >> $GITHUB_PATH
+
+      - name: Install gosec
+        run: go install github.com/securego/gosec/v2/cmd/gosec@latest
+
+      - name: Run gosec security check
+        run: gosec ./...
 
