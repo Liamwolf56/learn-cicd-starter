@@ -20,4 +20,3 @@ func GetAPIKey(headers http.Header) (string, error) {
 
 	return parts[1], nil
 }
-
