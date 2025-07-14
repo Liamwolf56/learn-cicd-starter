@@ -7,7 +7,6 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"time" // ✅ Needed for ReadHeaderTimeout
 
 	"github.com/go-chi/chi"
 	"github.com/go-chi/cors"
@@ -87,11 +86,11 @@ func main() {
 	v1Router.Get("/healthz", handlerReadiness)
 
 	router.Mount("/v1", v1Router)
-
 	srv := &http.Server{
-		Addr:              ":" + port,
-		Handler:           router,
-		ReadHeaderTimeout: 5 * time.Second, // ✅ FIXED: Slowloris protection
+		Addr:    ":" + port,
+		Handler: router,
+		// 👇 This line should be added per gosec warning:
+		ReadHeaderTimeout: 5 * 1e9, // 5s timeout
 	}
 
 	log.Printf("Serving on port: %s\n", port)
