@@ -9,6 +9,7 @@ on:
 
 jobs:
   Tests:
+    name: Tests
     runs-on: ubuntu-latest
 
     steps:
@@ -22,16 +23,17 @@ jobs:
       - name: Add Go bin to PATH
         run: echo "${HOME}/go/bin" >> $GITHUB_PATH
 
-      - name: Run tests with code coverage
+      - name: Run Go tests
         run: go test -cover ./...
 
       - name: Install gosec
         run: go install github.com/securego/gosec/v2/cmd/gosec@latest
 
-      - name: Run gosec
+      - name: Run gosec (security scan)
         run: gosec ./...
 
   Style:
+    name: Style
     runs-on: ubuntu-latest
 
     steps:
@@ -45,12 +47,12 @@ jobs:
       - name: Add Go bin to PATH
         run: echo "${HOME}/go/bin" >> $GITHUB_PATH
 
-      - name: Check formatting
+      - name: Check formatting with go fmt
         run: test -z "$(go fmt ./...)"
 
       - name: Install staticcheck
         run: go install honnef.co/go/tools/cmd/staticcheck@latest
 
-      - name: Run staticcheck
+      - name: Run staticcheck (linter)
         run: staticcheck ./...
 
