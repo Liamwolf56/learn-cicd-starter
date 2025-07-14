@@ -9,33 +9,39 @@ on:
 
 jobs:
   Tests:
+    name: Tests
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
-      - name: Set up Go 1.22
+      - name: Set up Go
         uses: actions/setup-go@v4
         with:
           go-version: 1.22
 
-      - name: Run tests with code coverage
+      - name: Run tests with coverage
         run: go test -cover ./...
 
+      - name: Install gosec
+        run: go install github.com/securego/gosec/v2/cmd/gosec@latest
+
+      - name: Run gosec
+        run: gosec ./...
+
   Style:
+    name: Style
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
-      - name: Set up Go 1.22
+      - name: Set up Go
         uses: actions/setup-go@v4
         with:
           go-version: 1.22
 
-      - name: Check formatting with go fmt
+      - name: Run go fmt
         run: test -z "$(go fmt ./...)"
 
       - name: Install staticcheck
