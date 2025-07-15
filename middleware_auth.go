@@ -11,12 +11,10 @@ type User struct {
 
 type authedHandler func(http.ResponseWriter, *http.Request, User)
 
-func (fn authedHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	// This is where you'd fetch the user via API key etc.
-	var user User
-	fn(w, r, user)
-}
-
 func (cfg *apiConfig) middlewareAuth(next authedHandler) http.Handler {
-	return next
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// Simulate user authentication; replace with real logic later
+		user := User{ID: 1, Email: "user@example.com"}
+		next(w, r, user)
+	})
 }

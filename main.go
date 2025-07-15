@@ -9,7 +9,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/go-chi/chi"
+	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/cors"
 	"github.com/joho/godotenv"
 
@@ -26,18 +26,17 @@ type apiConfig struct {
 var staticFiles embed.FS
 
 func main() {
-	err := godotenv.Load(".env")
-	if err != nil {
-		log.Printf("warning: unable to load .env: %v", err)
+	if err := godotenv.Load(".env"); err != nil {
+		log.Printf("Warning: .env not loaded: %v", err)
 	}
 
 	port := os.Getenv("PORT")
 	if port == "" {
-		log.Fatal("PORT environment variable is not set")
+		log.Println("PORT not set, defaulting to 8080")
+		port = "8080"
 	}
 
 	apiCfg := apiConfig{}
-
 	dbURL := os.Getenv("DATABASE_URL")
 	if dbURL != "" {
 		db, err := sql.Open("libsql", dbURL)
@@ -47,17 +46,16 @@ func main() {
 		apiCfg.DB = database.New(db)
 		log.Println("Connected to database!")
 	} else {
-		log.Println("Running without CRUD endpoints (DATABASE_URL not set)")
+		log.Println("No DATABASE_URL; running in non-DB mode")
 	}
 
 	router := chi.NewRouter()
 	router.Use(cors.Handler(cors.Options{
-		AllowedOrigins:   []string{"*"},
-		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
-		AllowedHeaders:   []string{"*"},
-		ExposedHeaders:   []string{"Link"},
-		AllowCredentials: false,
-		MaxAge:           300,
+		AllowedOrigins: []string{"*"},
+		AllowedMethods: []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowedHeaders: []string{"*"},
+		ExposedHeaders: []string{"Link"},
+		MaxAge:         300,
 	}))
 
 	router.Get("/", func(w http.ResponseWriter, r *http.Request) {
@@ -67,7 +65,7 @@ func main() {
 			return
 		}
 		defer f.Close()
-		if _, err := io.Copy(w, f); err != nil {
+		if _, err = io.Copy(w, f); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 		}
 	})
@@ -88,6 +86,6 @@ func main() {
 		ReadHeaderTimeout: 5 * time.Second,
 	}
 
-	log.Printf("Serving on port %s\n", port)
+	log.Printf("Serving on port %s", port)
 	log.Fatal(srv.ListenAndServe())
 }

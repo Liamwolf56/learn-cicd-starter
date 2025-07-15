@@ -8,7 +8,7 @@ import (
 func (cfg *apiConfig) handlerUsersCreate(w http.ResponseWriter, r *http.Request) {
 	var input map[string]string
 	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
-		respondWithError(w, http.StatusBadRequest, "invalid request body")
+		respondWithError(w, http.StatusBadRequest, "Invalid request payload")
 		return
 	}
 	respondWithJSON(w, http.StatusCreated, input)
