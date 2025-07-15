@@ -6,15 +6,16 @@ import (
 )
 
 func (cfg *apiConfig) handlerNotesGet(w http.ResponseWriter, r *http.Request, user User) {
-	notes := []string{"Note 1", "Note 2", "Note 3"} // placeholder
+	notes := []map[string]string{
+		{"id": "1", "text": "Note 1"},
+	}
 	respondWithJSON(w, http.StatusOK, notes)
 }
 
 func (cfg *apiConfig) handlerNotesCreate(w http.ResponseWriter, r *http.Request, user User) {
 	var note map[string]string
-	err := json.NewDecoder(r.Body).Decode(&note)
-	if err != nil {
-		respondWithError(w, http.StatusBadRequest, "invalid note")
+	if err := json.NewDecoder(r.Body).Decode(&note); err != nil {
+		respondWithError(w, http.StatusBadRequest, "invalid note body")
 		return
 	}
 	respondWithJSON(w, http.StatusCreated, note)

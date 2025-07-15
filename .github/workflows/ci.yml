@@ -1,4 +1,4 @@
-name: ci
+name: CI
 
 on:
   push:
@@ -6,6 +6,8 @@ on:
       - main
       - addtests
   pull_request:
+    branches:
+      - main
 
 jobs:
   Tests:
@@ -13,14 +15,18 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
+      - name: Check out code
+        uses: actions/checkout@v3
 
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
-          go-version: 1.22
+          go-version: "1.22"
 
-      - name: Run go test
+      - name: Install dependencies
+        run: go mod tidy
+
+      - name: Run unit tests
         run: go test -cover ./...
 
   Style:
@@ -28,43 +34,45 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
+      - name: Check out code
+        uses: actions/checkout@v3
 
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
-          go-version: 1.22
+          go-version: "1.22"
 
-      - name: Add Go bin to PATH
-        run: echo "${HOME}/go/bin" >> $GITHUB_PATH
-
-      - name: Check formatting with go fmt
-        run: test -z "$(go fmt ./...)"
+      - name: Check formatting
+        run: |
+          output=$(go fmt ./...)
+          if [ -n "$output" ]; then
+            echo "Code formatting issues:"
+            echo "$output"
+            exit 1
+          fi
 
       - name: Install staticcheck
         run: go install honnef.co/go/tools/cmd/staticcheck@latest
 
       - name: Run staticcheck
-        run: staticcheck ./...
+        run: $HOME/go/bin/staticcheck ./...
 
-  Gosec:
-    name: Gosec
+  Security:
+    name: Security
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
+      - name: Check out code
+        uses: actions/checkout@v3
 
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
-          go-version: 1.22
-
-      - name: Add Go bin to PATH
-        run: echo "${HOME}/go/bin" >> $GITHUB_PATH
+          go-version: "1.22"
 
       - name: Install gosec
         run: go install github.com/securego/gosec/v2/cmd/gosec@latest
 
-      - name: Run gosec security check
-        run: gosec ./...
+      - name: Run gosec
+        run: $HOME/go/bin/gosec ./...
 
