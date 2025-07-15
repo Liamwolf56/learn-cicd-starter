@@ -40,4 +40,3 @@ func TestGetAPIKey_InvalidPrefix(t *testing.T) {
 		t.Fatal("expected an error when Authorization header has wrong prefix")
 	}
 }
-
