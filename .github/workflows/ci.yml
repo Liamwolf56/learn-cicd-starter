@@ -2,74 +2,62 @@ name: CI
 
 on:
   push:
-    branches: [main, addtests]
+    branches:
+      - main
+      - addtests
   pull_request:
-    branches: [main]
+    branches:
+      - main
 
 jobs:
-  Tests:
+  test:
     name: Tests
     runs-on: ubuntu-latest
-
     steps:
-      - name: Check out code
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
       - name: Set up Go
-        uses: actions/setup-go@v5
+        uses: actions/setup-go@v4
         with:
-          go-version: "1.22"
+          go-version: '1.21'
 
       - name: Install dependencies
-        run: go mod tidy
+        run: go mod download
 
-      - name: Run unit tests
-        run: go test -cover ./...
+      - name: Run tests
+        run: go test -v -cover ./...
 
-  Style:
+  style:
     name: Style
     runs-on: ubuntu-latest
-
     steps:
-      - name: Check out code
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
       - name: Set up Go
-        uses: actions/setup-go@v5
+        uses: actions/setup-go@v4
         with:
-          go-version: "1.22"
+          go-version: '1.21'
 
       - name: Check formatting
-        run: |
-          output=$(go fmt ./...)
-          if [ -n "$output" ]; then
-            echo "Code formatting issues:"
-            echo "$output"
-            exit 1
-          fi
-
-      - name: Install staticcheck
-        run: go install honnef.co/go/tools/cmd/staticcheck@latest
+        run: test -z "$(go fmt ./...)"
 
       - name: Run staticcheck
-        run: $HOME/go/bin/staticcheck ./...
+        run: go install honnef.co/go/tools/cmd/staticcheck@latest && staticcheck ./...
 
-  Security:
+  security:
     name: Security
     runs-on: ubuntu-latest
-
     steps:
-      - name: Check out code
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
       - name: Set up Go
-        uses: actions/setup-go@v5
+        uses: actions/setup-go@v4
         with:
-          go-version: "1.22"
+          go-version: '1.21'
 
-      - name: Install gosec
+      - name: Install Gosec
         run: go install github.com/securego/gosec/v2/cmd/gosec@latest
 
-      - name: Run gosec
-        run: $HOME/go/bin/gosec ./...
+      - name: Run Gosec
+        run: ~/go/bin/gosec ./...
 

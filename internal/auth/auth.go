@@ -1,26 +1,30 @@
 package auth
 
 import (
+	"context"
 	"errors"
 	"net/http"
-	"strings"
 )
 
-var (
-	ErrNoAuthHeader        = errors.New("no authorization header included")
-	ErrMalformedAuthHeader = errors.New("malformed authorization header")
-)
+type User struct {
+	ID    int    `json:"id"`
+	Email string `json:"email"`
+	Name  string `json:"name"`
+	ApiKey string `json:"api_key"`
+}
 
 func GetAPIKey(headers http.Header) (string, error) {
-	authHeader := headers.Get("Authorization")
-	if authHeader == "" {
-		return "", ErrNoAuthHeader
+	key := headers.Get("X-API-Key")
+	if key == "" {
+		return "", errors.New("API key missing")
 	}
+	return key, nil
+}
 
-	parts := strings.SplitN(authHeader, " ", 2)
-	if len(parts) != 2 || parts[0] != "Bearer" {
-		return "", ErrMalformedAuthHeader
+func GetUserByAPIKey(ctx context.Context, key string) (User, error) {
+	// Stub user lookup logic
+	if key == "valid-key" {
+		return User{ID: 1, Email: "user@example.com", Name: "John Doe", ApiKey: key}, nil
 	}
-
-	return parts[1], nil
+	return User{}, errors.New("invalid API key")
 }

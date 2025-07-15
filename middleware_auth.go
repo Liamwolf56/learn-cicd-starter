@@ -2,19 +2,23 @@ package main
 
 import (
 	"net/http"
+	"github.com/bootdotdev/learn-cicd-starter/internal/auth"
 )
 
-type User struct {
-	ID    int
-	Email string
-}
+type authedHandler func(http.ResponseWriter, *http.Request, auth.User)
 
-type authedHandler func(http.ResponseWriter, *http.Request, User)
-
-func (cfg *apiConfig) middlewareAuth(next authedHandler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		// Simulate user authentication; replace with real logic later
-		user := User{ID: 1, Email: "user@example.com"}
-		next(w, r, user)
-	})
+func (cfg *apiConfig) middlewareAuth(h authedHandler) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		apiKey, err := auth.GetAPIKey(r.Header)
+		if err != nil {
+			respondWithError(w, http.StatusUnauthorized, "missing or malformed API key")
+			return
+		}
+		user, err := auth.GetUserByAPIKey(r.Context(), apiKey)
+		if err != nil {
+			respondWithError(w, http.StatusUnauthorized, "invalid API key")
+			return
+		}
+		h(w, r, user)
+	}
 }

@@ -1,20 +1,14 @@
 package main
 
 import (
-	"encoding/json"
 	"net/http"
+	"github.com/bootdotdev/learn-cicd-starter/internal/auth"
 )
 
-func (cfg *apiConfig) handlerNotesGet(w http.ResponseWriter, r *http.Request, user User) {
-	notes := []map[string]string{{"id": "1", "text": "Example note"}}
-	respondWithJSON(w, http.StatusOK, notes)
+func (cfg *apiConfig) handlerNotesGet(w http.ResponseWriter, r *http.Request, user auth.User) {
+	respondWithJSON(w, http.StatusOK, []string{"note 1", "note 2"})
 }
 
-func (cfg *apiConfig) handlerNotesCreate(w http.ResponseWriter, r *http.Request, user User) {
-	var note map[string]string
-	if err := json.NewDecoder(r.Body).Decode(&note); err != nil {
-		respondWithError(w, http.StatusBadRequest, "Invalid note format")
-		return
-	}
-	respondWithJSON(w, http.StatusCreated, note)
+func (cfg *apiConfig) handlerNotesCreate(w http.ResponseWriter, r *http.Request, user auth.User) {
+	respondWithJSON(w, http.StatusCreated, map[string]string{"status": "created"})
 }

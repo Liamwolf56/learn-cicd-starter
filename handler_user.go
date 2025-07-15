@@ -1,19 +1,10 @@
 package main
 
 import (
-	"encoding/json"
 	"net/http"
+	"github.com/bootdotdev/learn-cicd-starter/internal/auth"
 )
 
-func (cfg *apiConfig) handlerUsersCreate(w http.ResponseWriter, r *http.Request) {
-	var input map[string]string
-	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
-		respondWithError(w, http.StatusBadRequest, "Invalid request payload")
-		return
-	}
-	respondWithJSON(w, http.StatusCreated, input)
-}
-
-func (cfg *apiConfig) handlerUsersGet(w http.ResponseWriter, r *http.Request, user User) {
+func (cfg *apiConfig) handlerUsersGet(w http.ResponseWriter, r *http.Request, user auth.User) {
 	respondWithJSON(w, http.StatusOK, user)
 }
