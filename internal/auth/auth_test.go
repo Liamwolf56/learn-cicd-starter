@@ -1,21 +1,23 @@
 package auth
 
 import (
-    "os"
+    "net/http"
     "testing"
 )
 
 func TestGetAPIKey(t *testing.T) {
-    // Set the API key environment variable for testing
-    os.Setenv("API_KEY", "AIzaSyBhcC9jHtODH2Qkc-hGfsJDjYdpiIyXRk8")
+    // Create a fake header with the correct API key
+    header := http.Header{}
+    header.Set("Authorization", "ApiKey AIzaSyBhcC9jHtODH2Qkc-hGfsJDjYdpiIyXRk8")
 
-    apiKey, err := GetAPIKey()
+    apiKey, err := GetAPIKey(header)
     if err != nil {
         t.Errorf("did not expect error, got: %v", err)
     }
 
-    if apiKey != "AIzaSyBhcC9jHtODH2Qkc-hGfsJDjYdpiIyXRk8" {
-        t.Errorf("expected 'AIzaSyBhcC9jHtODH2Qkc-hGfsJDjYdpiIyXRk8', got %q", apiKey)
+    expected := "AIzaSyBhcC9jHtODH2Qkc-hGfsJDjYdpiIyXRk8"
+    if apiKey != expected {
+        t.Errorf("expected %q, got %q", expected, apiKey)
     }
 }
 
