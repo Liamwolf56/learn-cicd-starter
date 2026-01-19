@@ -28,7 +28,7 @@ func respondWithJSON(w http.ResponseWriter, code int, payload interface{}) {
 	}
 	w.Header().Add("Content-Type", "application/json")
 	w.WriteHeader(code)
-    
+
 	// Capturing the error here satisfies gosec G104
 	_, err = w.Write(dat)
 	if err != nil {
