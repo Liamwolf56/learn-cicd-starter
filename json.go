@@ -6,9 +6,10 @@ import (
 	"net/http"
 )
 
-func respondWithError(w http.ResponseWriter, code int, msg string) {
+// respondWithError now accepts the 4th 'err' argument to match the handler calls
+func respondWithError(w http.ResponseWriter, code int, msg string, err error) {
 	if code > 499 {
-		log.Printf("Responding with 5XX error: %s", msg)
+		log.Printf("Responding with 5XX error: %s. Error: %v", msg, err)
 	}
 	type errorResponse struct {
 		Error string `json:"error"`
@@ -27,6 +28,8 @@ func respondWithJSON(w http.ResponseWriter, code int, payload interface{}) {
 	}
 	w.Header().Add("Content-Type", "application/json")
 	w.WriteHeader(code)
+    
+	// Capturing the error here satisfies gosec G104
 	_, err = w.Write(dat)
 	if err != nil {
 		log.Printf("Failed to write response: %v", err)
